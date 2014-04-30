@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Net;
 using SharpSvn;
+using SharpSvn.Security;
 
 namespace VersionOne.ServiceHost.SubversionServices
 {
@@ -38,6 +39,11 @@ namespace VersionOne.ServiceHost.SubversionServices
 		    client.Authentication.ClearAuthenticationCache();
             client.Authentication.Clear();
             client.Authentication.DefaultCredentials = new NetworkCredential(username, password);
+            client.Authentication.SslServerTrustHandlers += delegate(object sender, SvnSslServerTrustEventArgs e)
+            {
+                e.AcceptedFailures = e.Failures;
+                e.Save = true; // Save acceptance to authentication store
+            };			
 		}
 
         public string GetRepositoryUuid(string url) 
